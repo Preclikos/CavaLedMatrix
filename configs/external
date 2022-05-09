@@ -1,0 +1,2 @@
+method = alsa
+source = hw:CARD=Device,DEV=0
