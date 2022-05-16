@@ -1,2 +1,2 @@
-method = pulse
-source = auto
+method = alsa
+source = hw:Loopback,1

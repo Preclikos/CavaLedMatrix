@@ -2,12 +2,14 @@
 from time import sleep
 import signal
 import sys
+import time
 import RPi.GPIO as GPIO
 from effect import Effect
 from os import listdir
 from os.path import isfile, join
 from config_parser import *
 from cava_run import *
+from display import *
 
 BUTTON_LEFT_DOWN_GPIO = 6
 BUTTON_LEFT_UP_GPIO = 5
@@ -17,13 +19,26 @@ BUTTON_RIGHT_DOWN_GPIO = 24
 selected_effect = ()
 effects = list()
 
+source = "false"
+
 def signal_handler(sig, frame):
     GPIO.cleanup()
     sys.exit(0)
 
 def button_pressed_callback(channel):
     print("Button pressed!")
-    print(channel)
+    #print(channel)
+    if(channel == 5):
+      switch_source();
+
+def switch_source():
+   global source
+   if(source == "true"):
+     source = "false";
+   else:
+     source = "true"
+   parse_config_file(source, selected_effect.channels, selected_effect.bars, selected_effect.size, selected_effect.freq)
+   start_effect(selected_effect.file)
 
 def parse_effects():
     global selected_effect
@@ -57,12 +72,13 @@ if __name__ == '__main__':
 
     parse_effects()
     selected_effect = effects[2]
-    parse_config_file(False, selected_effect.channels, selected_effect.bars, selected_effect.size, selected_effect.freq)
+    parse_config_file(source, selected_effect.channels, selected_effect.bars, selected_effect.size, selected_effect.freq)
     
     start_effect(selected_effect.file)
 
     while(True):
-     sleep(10)
+     display(selected_effect.name, source)
+     sleep(1.0 / 10)
 
     #signal.signal(signal.SIGINT, signal_handler)
     #signal.pause()

@@ -12,7 +12,7 @@ strip.begin()
 
 color_gradients = linear_gradient("#448300", "#FF0000", n=16)
 
-proc = subprocess.Popen(['cava','-p' 'config'],stdout=subprocess.PIPE)
+proc = subprocess.Popen(['cava','-p' 'configs/config'],stdout=subprocess.PIPE)
 #strip = PixelStrip(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BR>
 #strip.begin()
 for line in io.TextIOWrapper(proc.stdout, encoding="utf-8"):
