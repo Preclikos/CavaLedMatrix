@@ -36,19 +36,23 @@ def draw_dots(draw):
   #print(str(x) +" - "+str(y))
   #draw.text((x, y),"Sample Text",(r,g,b))
   draw.text((29, 49),"Source",(255,255,255),font=font)
-  draw.text((170, 49),"Pair",(255,255,255),font=font)
+  draw.text((170, 49),"Rand",(255,255,255),font=font)
   draw.text((29, 184),"Prev",(255,255,255),font=font)
   draw.text((160, 184),"Next",(255,255,255),font=font)
 
-def display(name, source):
+def display(name, source, random):
   image = Image.new("RGB", (240, 240), (0, 0, 0))
   draw = ImageDraw.Draw(image)
-  if(source == "true"):
+  if(source == True):
     draw.text((29, 25),"External",(255,255,255),font=font_small)
   else:
     draw.text((29, 25),"Internal",(255,255,255),font=font_small)
   (x, y) = font.getsize(name)
   draw.text((h_width - (x / 2), (h_height - (y /2))),name,(255,255,255),font=font)
+  if(random == True):
+    draw.text((200, 25),"On",(255,255,255),font=font_small)
+  else:
+    draw.text((200, 25),"Off",(255,255,255),font=font_small)
   draw_dots(draw)
 
   #hue = time.time() / 10

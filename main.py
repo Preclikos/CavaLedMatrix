@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-from time import sleep
+import random
+import time
 import signal
 import sys
 import time
@@ -19,24 +20,55 @@ BUTTON_RIGHT_DOWN_GPIO = 24
 selected_effect = ()
 effects = list()
 
-source = "false"
+source = False
+random_effect = True
+random_switch_time = time.time()
 
 def signal_handler(sig, frame):
     GPIO.cleanup()
     sys.exit(0)
 
 def button_pressed_callback(channel):
-    print("Button pressed!")
+    #print("Button pressed!")
     #print(channel)
     if(channel == 5):
       switch_source();
+    if(channel == 16):
+      switch_random();
+    if(channel == 6):
+      switch_f_r(False)
+    if(channel == 24):
+      switch_f_r(True)
+
+def switch_random():
+    global random_effect
+    if(random_effect == True):
+      random_effect = False;
+    else:
+      random_effect = True;
+
+def switch_f_r(forward):
+    global random_effect, effects, selected_effect
+    random_effect = False
+    index = effects.index(selected_effect)
+    print(index)
+    count = len(effects)
+    if(forward == True):
+      index = index + 1
+      if(index + 1 > count):
+        index = 0
+    else:
+      index = index - 1
+      if(index < 0):
+        index = len(effects)
+    switch_effect(index, random_effect)
 
 def switch_source():
    global source
-   if(source == "true"):
-     source = "false";
+   if(source == True):
+     source = False;
    else:
-     source = "true"
+     source = True;
    parse_config_file(source, selected_effect.channels, selected_effect.bars, selected_effect.size, selected_effect.freq)
    start_effect(selected_effect.file)
 
@@ -53,6 +85,18 @@ def parse_effects():
       effects.append(effect_object)
       selected_effect = effect_object
       counter = counter + 1
+
+def switch_effect(number, random_effect):
+    global selected_effect, effects
+    if(random_effect == True):
+      selected_effect = random.choice(effects)
+    else:
+      selected_effect = effects[number]
+    parse_config_file(source, selected_effect.channels, selected_effect.bars, selected_effect.size, selected_effect.freq)
+
+    start_effect(selected_effect.file)
+
+
 
 if __name__ == '__main__':
     GPIO.setmode(GPIO.BCM)
@@ -71,14 +115,15 @@ if __name__ == '__main__':
             callback=button_pressed_callback, bouncetime=200)
 
     parse_effects()
-    selected_effect = effects[2]
-    parse_config_file(source, selected_effect.channels, selected_effect.bars, selected_effect.size, selected_effect.freq)
-    
-    start_effect(selected_effect.file)
+
+    switch_effect(0, True)
 
     while(True):
-     display(selected_effect.name, source)
-     sleep(1.0 / 10)
+     if(random == True and random_switch_time < time.time()):
+       switch_effect(0, True)
+       random_switch_time = time.time() + 300
+     display(selected_effect.name, source, random_effect)
+     time.sleep(1.0 / 10)
 
     #signal.signal(signal.SIGINT, signal_handler)
     #signal.pause()
